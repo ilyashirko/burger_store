@@ -149,14 +149,15 @@ class Order(models.Model):
         auto_now_add=True,
         editable=False
     )
-    is_actual = models.BooleanField('Заказ в работе')
+    is_actual = models.BooleanField('Заказ в работе', default=True)
 
     def __str__(self):
         return f'[{self.uuid}] - {self.phonenumber} ({self.first_name} {self.last_name})'
 
     class Meta:
         indexes = [
-            models.Index(fields=['phonenumber'])
+            models.Index(fields=['phonenumber']),
+            models.Index(fields=['is_actual'])
         ]
 
 class OrderedProduct(models.Model):
