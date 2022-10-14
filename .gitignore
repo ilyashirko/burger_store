@@ -1,0 +1,20 @@
+# virtual environments
+env
+venv
+.venv
+
+# sensitive data
+.env
+
+# data
+media
+*.sqlite3
+.json
+
+# IDE
+**/__pycache__
+.parcel-cache
+
+
+
+node_modules
