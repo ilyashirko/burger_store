@@ -114,3 +114,4 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderedProduct)
 class OrderedProductAdmin(admin.ModelAdmin):
     pass
+

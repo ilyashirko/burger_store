@@ -5,11 +5,15 @@ from django.templatetags.static import static
 from phonenumber_field.validators import validate_international_phonenumber
 from django.core.exceptions import ValidationError
 from .models import Order, OrderedProduct, Product
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
+@api_view(['GET'])
 def banners_list_api(request):
     # FIXME move data to db?
-    return JsonResponse([
+    return Response(
+        [
         {
             'title': 'Burger',
             'src': static('burger.jpg'),
@@ -25,12 +29,11 @@ def banners_list_api(request):
             'src': static('tasty.jpg'),
             'text': 'Food is incomplete without a tasty dessert',
         }
-    ], safe=False, json_dumps_params={
-        'ensure_ascii': False,
-        'indent': 4,
-    })
+    ]
+    )
+    
 
-
+@api_view(['GET'])
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
 
@@ -53,17 +56,16 @@ def product_list_api(request):
             }
         }
         dumped_products.append(dumped_product)
-    return JsonResponse(dumped_products, safe=False, json_dumps_params={
-        'ensure_ascii': False,
-        'indent': 4,
-    })
+    return Response(dumped_products)
 
 
+@api_view(['POST'])
 def register_order(request):
-    order = json.loads(request.body.decode())
+    order = request.data
     try:
         validate_international_phonenumber(order['phonenumber'])
     except ValidationError as error:
+        print('FAIL phonenumber validator')
         return HttpResponseBadRequest()
     order_object = Order.objects.create(
         first_name=order['firstname'],
@@ -78,5 +80,5 @@ def register_order(request):
         )
         order_object.products.add(ordered_product_object)
     order_object.save()
-
-    return JsonResponse({})
+    
+    return Response(request.data)
