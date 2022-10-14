@@ -59,21 +59,32 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
+def check_order_data_validity(order_data):
+    if 'products' not in order_data or not order_data['products']:
+        raise ValidationError('There is no products in order')
+
+    if not isinstance(order_data['products'], (list, tuple)):
+        raise ValidationError('"Products" must be list or tuple.')
+
+    validate_international_phonenumber(order_data['phonenumber'])
+
+
 @api_view(['POST'])
 def register_order(request):
-    order = request.data
+    print('REGISTER_ORDER')
     try:
-        validate_international_phonenumber(order['phonenumber'])
+        check_order_data_validity(request.data)
     except ValidationError as error:
-        print('FAIL phonenumber validator')
-        return HttpResponseBadRequest()
+        print(error)
+        return Response({'error': error})
+
     order_object = Order.objects.create(
-        first_name=order['firstname'],
-        last_name=order['lastname'],
-        phonenumber=order['phonenumber'],
-        address=order['address']
+        first_name=request.data['firstname'],
+        last_name=request.data['lastname'],
+        phonenumber=request.data['phonenumber'],
+        address=request.data['address']
     )
-    for product in order['products']:
+    for product in request.data['products']:
         ordered_product_object, _ = OrderedProduct.objects.get_or_create(
             product=Product.objects.get(id=product['product']),
             quantity=product['quantity']
