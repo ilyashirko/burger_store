@@ -1,8 +1,10 @@
-from django.http import JsonResponse
+import json
+from urllib.error import HTTPError
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.templatetags.static import static
-
-
-from .models import Product
+from phonenumber_field.validators import validate_international_phonenumber
+from django.core.exceptions import ValidationError
+from .models import Order, OrderedProduct, Product
 
 
 def banners_list_api(request):
@@ -58,5 +60,23 @@ def product_list_api(request):
 
 
 def register_order(request):
-    # TODO это лишь заглушка
+    order = json.loads(request.body.decode())
+    try:
+        validate_international_phonenumber(order['phonenumber'])
+    except ValidationError as error:
+        return HttpResponseBadRequest()
+    order_object = Order.objects.create(
+        first_name=order['firstname'],
+        last_name=order['lastname'],
+        phonenumber=order['phonenumber'],
+        address=order['address']
+    )
+    for product in order['products']:
+        ordered_product_object, _ = OrderedProduct.objects.get_or_create(
+            product=Product.objects.get(id=product['product']),
+            quantity=product['quantity']
+        )
+        order_object.products.add(ordered_product_object)
+    order_object.save()
+
     return JsonResponse({})

@@ -1,5 +1,7 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator
+import uuid
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Restaurant(models.Model):
@@ -121,3 +123,47 @@ class RestaurantMenuItem(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
+
+
+class Order(models.Model):
+    uuid = models.CharField(
+        "id",
+        unique=True,
+        default=uuid.uuid1,
+        max_length=36,
+        validators=[MinLengthValidator(36)],
+        primary_key=True,
+        editable=False
+    )
+    first_name = models.CharField('Имя заказчика', max_length=100)
+    last_name = models.CharField('Фамилия заказчика', max_length=100)
+    phonenumber = PhoneNumberField('Телефон заказчика')
+    address = models.CharField('Адрес заказчика', max_length=200)
+    products = models.ManyToManyField(
+        'OrderedProduct',
+        verbose_name='Товары',
+        related_name='orders'
+    )
+    created_at = models.DateTimeField(
+        "Сформирован",
+        auto_now_add=True,
+        editable=False
+    )
+    is_actual = models.BooleanField('Заказ в работе')
+
+    def __str__(self):
+        return f'[{self.uuid}] - {self.phonenumber} ({self.first_name} {self.last_name})'
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['phonenumber'])
+        ]
+
+class OrderedProduct(models.Model):
+    product = models.ForeignKey(
+        'Product',
+        verbose_name='Товар',
+        related_name='ordered_product',
+        on_delete=models.PROTECT
+    )
+    quantity = models.SmallIntegerField('Количество')
