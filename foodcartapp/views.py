@@ -1,5 +1,6 @@
 import json
 from statistics import quantiles
+from unittest.loader import VALID_MODULE_NAME
 from urllib.error import HTTPError
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.templatetags.static import static
@@ -65,7 +66,7 @@ def product_list_api(request):
 class OrderSerializer(Serializer):
     class OrderProductSerializer(Serializer):
         product = IntegerField()
-        quantity = IntegerField()
+        quantity = IntegerField(min_value=1)
 
         def validate_product(self, value):
             available_products_ids = [
@@ -77,7 +78,7 @@ class OrderSerializer(Serializer):
                 raise ValidationError('Product is not available')
             return value
 
-    products = ListField(child=OrderProductSerializer(), allow_empty=False)
+    products = ListField(child=OrderProductSerializer(), allow_empty=False, write_only=True)
     firstname = CharField()
     lastname = CharField()
     phonenumber = PhoneNumberField()
