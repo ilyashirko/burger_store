@@ -60,18 +60,21 @@ def product_list_api(request):
 
 
 def check_order_data_validity(order_data):
-    if 'products' not in order_data or not order_data['products']:
-        raise ValidationError('There is no products in order')
-
-    if not isinstance(order_data['products'], (list, tuple)):
-        raise ValidationError('"Products" must be list or tuple.')
-
+    order_keys = ('products', 'firstname', 'lastname', 'phonenumber', 'address')
+    for key in order_keys:
+        if key not in order_data or not order_data[key]:
+            raise ValidationError(f'There is no {key} in order')
+        if key != 'products' and not isinstance(order_data[key], str):
+            raise ValidationError(f'{key} must be string.')
+        elif key != 'products' and not isinstance(order_data['products'], (list, tuple)):
+            raise ValidationError('Products must be list or tuple.')
     validate_international_phonenumber(order_data['phonenumber'])
 
 
 @api_view(['POST'])
 def register_order(request):
     print('REGISTER_ORDER')
+
     try:
         check_order_data_validity(request.data)
     except ValidationError as error:
