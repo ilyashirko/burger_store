@@ -135,8 +135,8 @@ class Order(models.Model):
         primary_key=True,
         editable=False
     )
-    first_name = models.CharField('Имя заказчика', max_length=100)
-    last_name = models.CharField('Фамилия заказчика', max_length=100)
+    firstname = models.CharField('Имя заказчика', max_length=100)
+    lastname = models.CharField('Фамилия заказчика', max_length=100)
     phonenumber = PhoneNumberField('Телефон заказчика')
     address = models.CharField('Адрес заказчика', max_length=200)
     products = models.ManyToManyField(
@@ -152,7 +152,7 @@ class Order(models.Model):
     is_actual = models.BooleanField('Заказ в работе', default=True)
 
     def __str__(self):
-        return f'[{self.uuid}] - {self.phonenumber} ({self.first_name} {self.last_name})'
+        return f'[{self.uuid}] - {self.phonenumber} ({self.firstname} {self.lastname})'
 
     class Meta:
         indexes = [
