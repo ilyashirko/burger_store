@@ -89,9 +89,19 @@ def view_restaurants(request):
         'restaurants': Restaurant.objects.all(),
     })
 
-
+from foodcartapp.models import Order
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    orders = Order.objects.filter(is_actual=True).prefetch_related('products')
+    order_items = [
+        {
+            'uuid': order.uuid,
+            'client': f'{order.firstname} {order.lastname}',
+            'phonenumber': str(order.phonenumber),
+            'address': order.address
+        }
+        for order in orders
+    ]
     return render(request, template_name='order_items.html', context={
-        # TODO заглушка для нереализованного функционала
+        'order_items': order_items
     })
