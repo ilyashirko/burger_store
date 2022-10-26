@@ -124,6 +124,13 @@ class RestaurantMenuItem(models.Model):
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
 
+from django.db.models import Prefetch
+
+class OrderQuerySet(models.QuerySet):
+    def actual_orders_with_prices(self):
+        return self.filter(is_actual=True).prefetch_related('products__product')
+        
+
 
 class Order(models.Model):
     uuid = models.CharField(
@@ -151,9 +158,14 @@ class Order(models.Model):
     )
     is_actual = models.BooleanField('Заказ в работе', default=True)
 
+    objects = OrderQuerySet.as_manager()
+
     def __str__(self):
         return f'[{self.uuid}] - {self.phonenumber} ({self.firstname} {self.lastname})'
 
+    def calc_price(self):
+        return sum([product.product.price * product.quantity for product in self.products.all()])
+    
     class Meta:
         indexes = [
             models.Index(fields=['phonenumber']),
@@ -168,3 +180,6 @@ class OrderedProduct(models.Model):
         on_delete=models.PROTECT
     )
     quantity = models.SmallIntegerField('Количество')
+
+    def get_summ(self):
+        return self.product.price * self.quantity

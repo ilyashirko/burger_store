@@ -1,14 +1,13 @@
-from django import forms
-from django.shortcuts import redirect, render
-from django.views import View
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import user_passes_test
+from re import L
 
+from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
-
-from foodcartapp.models import Product, Restaurant
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views import View
+from foodcartapp.models import Order, Product, Restaurant
 
 
 class Login(forms.Form):
@@ -89,16 +88,17 @@ def view_restaurants(request):
         'restaurants': Restaurant.objects.all(),
     })
 
-from foodcartapp.models import Order
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.filter(is_actual=True).prefetch_related('products')
+    orders = Order.objects.actual_orders_with_prices()
     order_items = [
         {
             'uuid': order.uuid,
             'client': f'{order.firstname} {order.lastname}',
             'phonenumber': str(order.phonenumber),
-            'address': order.address
+            'address': order.address,
+            'price': order.calc_price()
         }
         for order in orders
     ]

@@ -108,7 +108,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('firstname', 'lastname', 'phonenumber')
+    list_display = ('uuid', 'firstname', 'lastname', 'phonenumber')
     raw_id_fields = ("products",)
 
 
