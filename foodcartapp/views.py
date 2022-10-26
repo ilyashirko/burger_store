@@ -88,12 +88,13 @@ class OrderSerializer(Serializer):
             address=validated_data['address']
         )
         for product in validated_data['products']:
+            product_object = Product.objects.get(id=product['product'])
             ordered_product_object, _ = OrderedProduct.objects.get_or_create(
-                product=Product.objects.get(id=product['product']),
-                quantity=product['quantity']
+                order=order_object,
+                product=product_object,
+                quantity=product['quantity'],
+                current_price=product_object.price
             )
-            order_object.products.add(ordered_product_object)
-            order_object.save()
         self.uuid = order_object.uuid
         return order_object
 

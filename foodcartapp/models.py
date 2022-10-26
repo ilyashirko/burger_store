@@ -146,11 +146,6 @@ class Order(models.Model):
     lastname = models.CharField('Фамилия заказчика', max_length=100)
     phonenumber = PhoneNumberField('Телефон заказчика')
     address = models.CharField('Адрес заказчика', max_length=200)
-    products = models.ManyToManyField(
-        'OrderedProduct',
-        verbose_name='Товары',
-        related_name='orders'
-    )
     created_at = models.DateTimeField(
         "Сформирован",
         auto_now_add=True,
@@ -173,13 +168,27 @@ class Order(models.Model):
         ]
 
 class OrderedProduct(models.Model):
+    order = models.ForeignKey(
+        'Order',
+        verbose_name='Заказ',
+        related_name='ordered_product',
+        on_delete=models.PROTECT,
+        null=True
+    )
     product = models.ForeignKey(
         'Product',
         verbose_name='Товар',
         related_name='ordered_product',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
     quantity = models.SmallIntegerField('Количество')
+    current_price = models.SmallIntegerField(
+        'Стоимость единицы на момент оформления',
+        default=0
+    )
+
+    def __str__(self):
+        return self.product.name
 
     def get_summ(self):
         return self.product.price * self.quantity

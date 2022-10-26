@@ -105,14 +105,16 @@ class ProductAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     pass
 
+class OrderedProductInline(admin.TabularInline):
+    model = OrderedProduct
+    extra = 0
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'firstname', 'lastname', 'phonenumber')
-    raw_id_fields = ("products",)
-
+    inlines = (OrderedProductInline, )
+    
 
 @admin.register(OrderedProduct)
 class OrderedProductAdmin(admin.ModelAdmin):
-    pass
-
+    list_display = ('product', 'quantity')
