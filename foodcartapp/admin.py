@@ -126,10 +126,11 @@ class OrderAdmin(admin.ModelAdmin):
         'lastname',
         'phonenumber',
         'created_at',
-        'is_actual'
+        'status',
+        'completed'
     )
     inlines = (OrderedProductInline, )
-    ordering = ('-is_actual', 'created_at')
+    ordering = ('completed', 'created_at')
 
     def save_formset(self, request, form, formset, change):
         added_products = formset.save(commit=False)
