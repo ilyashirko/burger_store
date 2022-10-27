@@ -1,12 +1,13 @@
 from django.contrib import admin
-from django.shortcuts import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.urls import reverse
 
-from .models import Order, OrderedProduct, Product
-from .models import ProductCategory
-from .models import Restaurant
-from .models import RestaurantMenuItem
+from .models import (Order, OrderedProduct, Product, ProductCategory,
+                     Restaurant, RestaurantMenuItem)
+from restaurateur import views as restaurateur_views
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -128,7 +129,7 @@ class OrderAdmin(admin.ModelAdmin):
         'is_actual'
     )
     inlines = (OrderedProductInline, )
-    ordering = ('-is_actual', '-created_at')
+    ordering = ('-is_actual', 'created_at')
 
     def save_formset(self, request, form, formset, change):
         added_products = formset.save(commit=False)
@@ -140,6 +141,13 @@ class OrderAdmin(admin.ModelAdmin):
                 current_price = ordered_product.product.price
                 ordered_product.price_at_the_order_moment = current_price
             ordered_product.save()
+    
+    def response_post_save_change(self, request, obj):
+        response = super().response_post_save_change(request, obj)
+        if "return" in request.GET:
+            return redirect(request.GET['return'])
+        else:
+            return response
 
 
 @admin.register(OrderedProduct)

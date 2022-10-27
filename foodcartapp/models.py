@@ -128,7 +128,8 @@ class RestaurantMenuItem(models.Model):
 class OrderQuerySet(models.QuerySet):
     def actual_orders(self):
         return self.filter(is_actual=True) \
-            .prefetch_related('ordered_product__product')
+            .prefetch_related('ordered_product__product') \
+            .order_by('created_at')
 
 
 class Order(models.Model):

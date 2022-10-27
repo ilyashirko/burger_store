@@ -101,10 +101,11 @@ def view_orders(request):
             'client': f'{order.firstname} {order.lastname}',
             'phonenumber': str(order.phonenumber),
             'address': order.address,
-            'price': order.calc_price()
+            'price': order.calc_price(),
         }
         for order in orders
     ]
     return render(request, template_name='order_items.html', context={
-        'order_items': order_items
+        'order_items': order_items,
+        'return_url': request.path
     })
