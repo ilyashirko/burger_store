@@ -127,7 +127,8 @@ class RestaurantMenuItem(models.Model):
 
 class OrderQuerySet(models.QuerySet):
     def actual_orders_with_prices(self):
-        return self.filter(is_actual=True).prefetch_related('products__product')
+        return self.filter(is_actual=True) \
+            .prefetch_related('products__product')
 
 
 class Order(models.Model):
@@ -154,16 +155,25 @@ class Order(models.Model):
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
-        return f'[{self.uuid}] - {self.phonenumber} ({self.firstname} {self.lastname})'
+        return (
+            f'[{self.uuid}] - {self.phonenumber} '
+            f'({self.firstname} {self.lastname})'
+        )
 
     def calc_price(self):
-        return sum([product.product.price * product.quantity for product in self.products.all()])
-    
+        return sum(
+            [
+                product.product.price * product.quantity
+                for product in self.products.all()
+            ]
+        )
+
     class Meta:
         indexes = [
             models.Index(fields=['phonenumber']),
             models.Index(fields=['is_actual'])
         ]
+
 
 class OrderedProduct(models.Model):
     order = models.ForeignKey(

@@ -9,7 +9,8 @@ def fix_prices(apps, scheme_editor):
         price_at_the_order_moment=None
     )
     for ordered_product in ordered_products_no_price.iterator():
-        ordered_product.price_at_the_order_moment = ordered_product.product.price
+        ordered_product.price_at_the_order_moment = \
+            ordered_product.product.price
         ordered_product.save()
 
 

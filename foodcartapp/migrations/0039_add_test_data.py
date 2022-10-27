@@ -7,6 +7,7 @@ from random import choice, randint
 from django.db import migrations
 from django.core.files.base import ContentFile
 
+
 def add_restaurants(apps, scheme_editor):
     Restaurant = apps.get_model('foodcartapp', 'Restaurant')
     restaurants = [
@@ -33,6 +34,7 @@ def add_restaurants(apps, scheme_editor):
             contact_phone=restaurant['contact_phone']
         )
 
+
 def add_products(apps, scheme_editor):
     Product = apps.get_model('foodcartapp', 'Product')
     ProductCategory = apps.get_model('foodcartapp', 'ProductCategory')
@@ -43,9 +45,9 @@ def add_products(apps, scheme_editor):
     prod_cat, _ = ProductCategory.objects.get_or_create(name='burger')
     images = os.listdir('test_images')
     for num, image in enumerate(images):
-        
+
         with open(f'test_images/{image}', 'rb') as image_file:
-            
+
             photo = ContentFile(
                 image_file.read(),
                 name=md5(image_file.read()).hexdigest()
@@ -60,8 +62,6 @@ def add_products(apps, scheme_editor):
             restaurant=choice(restaurants),
             product=product
         )
-
-
 
 
 class Migration(migrations.Migration):

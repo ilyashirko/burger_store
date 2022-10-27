@@ -90,19 +90,26 @@ class ProductAdmin(admin.ModelAdmin):
     def get_image_preview(self, obj):
         if not obj.image:
             return 'выберите картинку'
-        return format_html('<img src="{url}" style="max-height: 200px;"/>', url=obj.image.url)
+        return format_html(
+            '<img src="{url}" style="max-height: 200px;"/>',
+            url=obj.image.url
+        )
     get_image_preview.short_description = 'превью'
 
     def get_image_list_preview(self, obj):
         if not obj.image or not obj.id:
             return 'нет картинки'
         edit_url = reverse('admin:foodcartapp_product_change', args=(obj.id,))
-        return format_html('<a href="{edit_url}"><img src="{src}" style="max-height: 50px;"/></a>', edit_url=edit_url, src=obj.image.url)
+        return format_html(
+            '<a href="{edit_url}"><img src="{src}" style="max-height: 50px;"/></a>',
+            edit_url=edit_url,
+            src=obj.image.url
+        )
     get_image_list_preview.short_description = 'превью'
 
 
 @admin.register(ProductCategory)
-class ProductAdmin(admin.ModelAdmin):
+class ProductCategory(admin.ModelAdmin):
     pass
 
 
@@ -110,9 +117,16 @@ class OrderedProductInline(admin.TabularInline):
     model = OrderedProduct
     extra = 0
 
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('firstname', 'lastname', 'phonenumber', 'created_at', 'is_actual')
+    list_display = (
+        'firstname',
+        'lastname',
+        'phonenumber',
+        'created_at',
+        'is_actual'
+    )
     inlines = (OrderedProductInline, )
     ordering = ('-is_actual', '-created_at')
 
@@ -126,8 +140,7 @@ class OrderAdmin(admin.ModelAdmin):
                 current_price = ordered_product.product.price
                 ordered_product.price_at_the_order_moment = current_price
             ordered_product.save()
-        
-    
+
 
 @admin.register(OrderedProduct)
 class OrderedProductAdmin(admin.ModelAdmin):

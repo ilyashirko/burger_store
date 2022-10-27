@@ -1,5 +1,3 @@
-from re import L
-
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -69,9 +67,14 @@ def view_products(request):
 
     products_with_restaurant_availability = []
     for product in products:
-        availability = {item.restaurant_id: item.availability for item in product.menu_items.all()}
-        ordered_availability = [availability.get(restaurant.id, False) for restaurant in restaurants]
-
+        availability = {
+            item.restaurant_id: item.availability
+            for item in product.menu_items.all()
+        }
+        ordered_availability = [
+            availability.get(restaurant.id, False)
+            for restaurant in restaurants
+        ]
         products_with_restaurant_availability.append(
             (product, ordered_availability)
         )

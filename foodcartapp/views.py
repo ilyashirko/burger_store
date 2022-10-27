@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.templatetags.static import static
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework.decorators import api_view
@@ -30,7 +31,7 @@ def banners_list_api(request):
                 'text': 'Food is incomplete without a tachild',
             }
         ])
-    
+
 
 @api_view(['GET'])
 def product_list_api(request):
@@ -74,12 +75,17 @@ class OrderSerializer(Serializer):
             return value
 
     uuid = CharField(required=False)
-    products = ListField(child=OrderProductSerializer(), allow_empty=False, write_only=True)
+    products = ListField(
+        child=OrderProductSerializer(),
+        allow_empty=False,
+        write_only=True
+    )
     firstname = CharField()
     lastname = CharField()
     phonenumber = PhoneNumberField()
     address = CharField()
 
+    @transaction.atomic
     def create(self, validated_data):
         order_object = Order.objects.create(
             firstname=validated_data['firstname'],
