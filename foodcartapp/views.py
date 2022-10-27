@@ -93,9 +93,11 @@ class OrderSerializer(Serializer):
             phonenumber=validated_data['phonenumber'],
             address=validated_data['address']
         )
+        if not validated_data['products']:
+            raise ValueError
         for product in validated_data['products']:
             product_object = Product.objects.get(id=product['product'])
-            ordered_product_object, _ = OrderedProduct.objects.get_or_create(
+            OrderedProduct.objects.get_or_create(
                 order=order_object,
                 product=product_object,
                 quantity=product['quantity'],
