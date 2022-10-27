@@ -98,6 +98,7 @@ def view_orders(request):
     order_items = [
         {
             'uuid': order.uuid,
+            'status': order.get_status_display(),
             'client': f'{order.firstname} {order.lastname}',
             'phonenumber': str(order.phonenumber),
             'address': order.address,

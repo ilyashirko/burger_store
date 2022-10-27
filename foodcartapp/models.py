@@ -127,7 +127,7 @@ class RestaurantMenuItem(models.Model):
 
 class OrderQuerySet(models.QuerySet):
     def actual_orders(self):
-        return self.filter(completed=False) \
+        return self.exclude(status='complete') \
             .prefetch_related('ordered_product__product') \
             .order_by('created_at')
 
@@ -159,8 +159,7 @@ class Order(models.Model):
         editable=False
     )
     status = models.CharField('Статус заказа', max_length=50, choices=STATUSES, default='new')
-    completed = models.BooleanField('Выполнен', default=False)
-
+    
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
@@ -180,7 +179,7 @@ class Order(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['phonenumber']),
-            models.Index(fields=['completed'])
+            models.Index(fields=['status'])
         ]
 
 
