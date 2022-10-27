@@ -113,6 +113,18 @@ class OrderedProductInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'firstname', 'lastname', 'phonenumber')
     inlines = (OrderedProductInline, )
+
+    def save_formset(self, request, form, formset, change):
+        added_products = formset.save(commit=False)
+        deleted_products = formset.deleted_objects
+        for ordered_product in deleted_products:
+            ordered_product.delete()
+        for ordered_product in added_products:
+            if not ordered_product.price_at_the_order_moment:
+                current_price = ordered_product.product.price
+                ordered_product.price_at_the_order_moment = current_price
+            ordered_product.save()
+        
     
 
 @admin.register(OrderedProduct)

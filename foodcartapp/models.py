@@ -124,12 +124,10 @@ class RestaurantMenuItem(models.Model):
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
 
-from django.db.models import Prefetch
 
 class OrderQuerySet(models.QuerySet):
     def actual_orders_with_prices(self):
         return self.filter(is_actual=True).prefetch_related('products__product')
-        
 
 
 class Order(models.Model):
@@ -181,14 +179,22 @@ class OrderedProduct(models.Model):
         related_name='ordered_product',
         on_delete=models.PROTECT,
     )
-    quantity = models.SmallIntegerField('Количество')
-    current_price = models.SmallIntegerField(
-        'Стоимость единицы на момент оформления',
-        default=0
+    quantity = models.SmallIntegerField(
+        'Количество',
+        validators=[MinValueValidator(0)],
+    )
+    price_at_the_order_moment = models.DecimalField(
+        'Цена на время заказа',
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        null=True,
+        blank=True,
+        help_text='Оставить пустым, заполняется автоматически'
     )
 
     def __str__(self):
         return self.product.name
 
     def get_summ(self):
-        return self.product.price * self.quantity
+        return self.price_at_the_order_moment * self.quantity

@@ -93,7 +93,7 @@ class OrderSerializer(Serializer):
                 order=order_object,
                 product=product_object,
                 quantity=product['quantity'],
-                current_price=product_object.price
+                price_at_the_order_moment=product_object.price
             )
         self.uuid = order_object.uuid
         return order_object
