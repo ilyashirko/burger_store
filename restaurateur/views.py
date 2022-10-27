@@ -94,7 +94,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.actual_orders_with_prices()
+    orders = Order.objects.actual_orders()
     order_items = [
         {
             'uuid': order.uuid,
