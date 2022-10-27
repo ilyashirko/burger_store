@@ -14,7 +14,7 @@ media
 # IDE
 **/__pycache__
 .parcel-cache
-
+.vscode
 
 
 node_modules

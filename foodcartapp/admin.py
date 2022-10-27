@@ -105,14 +105,16 @@ class ProductAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     pass
 
+
 class OrderedProductInline(admin.TabularInline):
     model = OrderedProduct
     extra = 0
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'firstname', 'lastname', 'phonenumber')
+    list_display = ('firstname', 'lastname', 'phonenumber', 'created_at', 'is_actual')
     inlines = (OrderedProductInline, )
+    ordering = ('-is_actual', '-created_at')
 
     def save_formset(self, request, form, formset, change):
         added_products = formset.save(commit=False)
