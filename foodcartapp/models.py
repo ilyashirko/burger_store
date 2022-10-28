@@ -140,6 +140,12 @@ class Order(models.Model):
         ('complete', 'Выполнен')
     )
 
+    PAYMENT_METHODS = (
+        ('online', 'Онлайн, безнал'),
+        ('upon_delivery', 'На адресе, наличные'),
+        ('clarify', 'Уточнить у клиента')
+    )
+    
     uuid = models.CharField(
         "id",
         unique=True,
@@ -169,6 +175,12 @@ class Order(models.Model):
     )
     comment = models.TextField('Комментарий', blank=True)
     status = models.CharField('Статус заказа', max_length=50, choices=STATUSES, default='new')
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=50,
+        choices=PAYMENT_METHODS,
+        default='clarify'
+    )
     
     objects = OrderQuerySet.as_manager()
 
