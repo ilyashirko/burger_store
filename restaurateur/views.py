@@ -92,9 +92,26 @@ def view_restaurants(request):
     })
 
 
+def get_available_executors(order,
+                            current_restaurants=Restaurant.objects.all()):
+    ordered_products = set(
+        ordered_product.product
+        for ordered_product in order.ordered_product.all()
+    )
+    available_executors = list()
+    for restaurant in current_restaurants:
+        restaurant_products = set(
+            item.product for item in restaurant.menu_items.all()
+        )
+        if ordered_products.issubset(restaurant_products):
+            available_executors.append(restaurant)
+    return available_executors
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.actual_orders()
+    actual_orders = Order.objects.actual_orders()
+    restaurants = Restaurant.objects.all().prefetch_related('menu_items__product')
     order_items = [
         {
             'uuid': order.uuid,
@@ -105,8 +122,14 @@ def view_orders(request):
             'address': order.address,
             'price': order.calc_price(),
             'comment': order.comment if order.comment else '',
+            'available_restaurants': [
+                restaurant.name 
+                for restaurant
+                in get_available_executors(order, restaurants)
+            ],
+            'executor': order.executor if order.executor else None,
         }
-        for order in orders
+        for order in actual_orders
     ]
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,

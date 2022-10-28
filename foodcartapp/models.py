@@ -129,12 +129,13 @@ class OrderQuerySet(models.QuerySet):
     def actual_orders(self):
         return self.exclude(status='complete') \
             .prefetch_related('ordered_product__product') \
-            .order_by('created_at')
+            .order_by('-status', 'created_at')
 
 
 class Order(models.Model):
     STATUSES = (
         ('new', 'Ожидает подтверждения'),
+        ('in_process', 'Готовится'),
         ('assembly', 'Сборка'),
         ('delivery', 'Доставляется'),
         ('complete', 'Выполнен')
@@ -145,7 +146,7 @@ class Order(models.Model):
         ('upon_delivery', 'На адресе, наличные'),
         ('clarify', 'Уточнить у клиента')
     )
-    
+
     uuid = models.CharField(
         "id",
         unique=True,
@@ -181,7 +182,15 @@ class Order(models.Model):
         choices=PAYMENT_METHODS,
         default='clarify'
     )
-    
+    executor = models.CharField(
+        'Исполнитель',
+        max_length=50,
+        choices=set(
+            (restaurant.name, restaurant.name)
+            for restaurant in Restaurant.objects.all()
+        ),
+        blank=True
+    )
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
@@ -197,6 +206,13 @@ class Order(models.Model):
                 for product in self.ordered_product.all()
             ]
         )
+
+    def save(self, *args, **kwargs):
+        if self.executor and self.status == 'new':
+            self.status = 'in_process'
+        elif not self.executor and self.status != 'new':
+            self.status = 'new'
+        super().save(*args, **kwargs)
 
     class Meta:
         indexes = [
