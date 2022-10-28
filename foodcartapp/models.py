@@ -189,7 +189,10 @@ class Order(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['phonenumber']),
-            models.Index(fields=['status'])
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['called_at']),
+            models.Index(fields=['delivered_at']),
         ]
 
 
