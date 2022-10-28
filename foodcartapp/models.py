@@ -155,8 +155,17 @@ class Order(models.Model):
     address = models.CharField('Адрес заказчика', max_length=200)
     created_at = models.DateTimeField(
         "Сформирован",
-        auto_now_add=True,
-        editable=False
+        auto_now_add=True
+    )
+    called_at = models.DateTimeField(
+        "Время звонка",
+        blank=True,
+        null=True,
+    )
+    delivered_at = models.DateTimeField(
+        "Доставлен",
+        blank=True,
+        null=True,
     )
     comment = models.TextField('Комментарий', blank=True)
     status = models.CharField('Статус заказа', max_length=50, choices=STATUSES, default='new')

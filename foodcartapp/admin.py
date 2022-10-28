@@ -128,6 +128,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at',
         'status',
     )
+    readonly_fields = ['created_at']
     inlines = (OrderedProductInline, )
     ordering = ('-status', 'created_at', )
 
