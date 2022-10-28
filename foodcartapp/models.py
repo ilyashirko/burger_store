@@ -158,6 +158,7 @@ class Order(models.Model):
         auto_now_add=True,
         editable=False
     )
+    comment = models.TextField('Комментарий', blank=True)
     status = models.CharField('Статус заказа', max_length=50, choices=STATUSES, default='new')
     
     objects = OrderQuerySet.as_manager()

@@ -103,6 +103,7 @@ def view_orders(request):
             'phonenumber': str(order.phonenumber),
             'address': order.address,
             'price': order.calc_price(),
+            'comment': order.comment if order.comment else '',
         }
         for order in orders
     ]
