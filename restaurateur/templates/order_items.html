@@ -44,7 +44,11 @@
             <p>Может быть приготовлен ресторанами</p>
             <ul>
               {% for restaurant in item.available_restaurants %}
-                <li>{{ restaurant }}</li>
+                {% if restaurant.distance is None %}
+                  <li>{{ restaurant.name }} (неверный адрес)</li>
+                {% else %}
+                  <li>{{ restaurant.name }} ({{ restaurant.distance }} км)</li>
+                {% endif %}
               {% endfor %}
             </ul>
           </td>
