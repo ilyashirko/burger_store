@@ -129,18 +129,18 @@ def fetch_coordinates(apikey, address):
     return lon, lat
 
 
-def get_restaurants_with_distance(restaurants,
+def get_restaurants_with_distance(restaurants_with_coordinates,
                                   order,
                                   ya_geo_api_key=os.getenv('YANDEX_GEO_API_KEY')):
+
     order_coordinates = fetch_coordinates(ya_geo_api_key, order.address)
     available_restaurants = list()
-    for restaurant in get_available_executors(order, restaurants):
-        restaurant_coordinates = fetch_coordinates(ya_geo_api_key, restaurant.address)
-        if order_coordinates is None or restaurant_coordinates is None:
+    for restaurant in get_available_executors(order, restaurants_with_coordinates):
+        if order_coordinates is None or restaurant.coordinates is None:
             distance = None
         else:
             distance = round(
-                calc_distance(order_coordinates, restaurant_coordinates).km,
+                calc_distance(order_coordinates, restaurant.coordinates).km,
                 1
             )
         available_restaurants.append(
@@ -154,8 +154,14 @@ def get_restaurants_with_distance(restaurants,
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+
     actual_orders = Order.objects.actual_orders()
     restaurants = Restaurant.objects.all().prefetch_related('menu_items__product')
+    ya_geo_api_key = os.getenv('YANDEX_GEO_API_KEY')
+
+    for restaurant in restaurants:
+        restaurant.coordinates = fetch_coordinates(ya_geo_api_key, restaurant.address)
+
     order_items = [
         {
             'uuid': order.uuid,
