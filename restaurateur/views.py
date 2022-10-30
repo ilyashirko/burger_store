@@ -113,14 +113,12 @@ def get_available_executors(order,
     return available_executors
 
 
-def get_restaurants_with_distance(restaurants, order):
+def get_restaurants_with_distance(restaurants_with_locations, order):
 
     order_coordinates, _ = Location.objects.get_or_create(address=order.address)
     available_restaurants = list()
-    for restaurant in get_available_executors(order, restaurants):
-        restaurant_coordinates, _ = Location.objects.get_or_create(address=restaurant.address)
-
-        if order_coordinates.is_corrupted() or restaurant_coordinates.is_corrupted():
+    for restaurant in get_available_executors(order, restaurants_with_locations):
+        if order_coordinates.is_corrupted() or restaurant.location.is_corrupted():
             distance = None
         else:
             distance = round(
@@ -130,8 +128,8 @@ def get_restaurants_with_distance(restaurants, order):
                         order_coordinates.latitude
                     ),
                     (
-                        restaurant_coordinates.longitude,
-                        restaurant_coordinates.latitude
+                        restaurant.location.longitude,
+                        restaurant.location.latitude
                     )
                 ).km,
                 1
@@ -151,6 +149,10 @@ def view_orders(request):
     actual_orders = Order.objects.actual_orders()
     restaurants = Restaurant.objects.all().prefetch_related('menu_items__product')
 
+    for restaurant in restaurants:
+        restaurant_location, _ = Location.objects.get_or_create(address=restaurant.address)
+        restaurant.location = restaurant_location
+
     order_items = [
         {
             'uuid': order.uuid,
@@ -166,6 +168,7 @@ def view_orders(request):
         }
         for order in actual_orders
     ]
+ 
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
         'return_url': request.path

@@ -7,7 +7,7 @@ class LocationQuerySet(models.QuerySet):
     def get_or_create(self, defaults=None, **kwargs):
         self._for_write = True
         try:
-            return self.get(**kwargs), False
+            return super().get(**kwargs), False
         except Location.DoesNotExist:
             kwargs['longitude'], kwargs['latitude'] = self._fetch_coordinates(kwargs['address'])
             return super().get_or_create(defaults, **kwargs)
