@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from foodcartapp.models import Order, Product, Restaurant
 from geopy.distance import distance as calc_distance
+from geo_management.models import Location
+
 
 
 class Login(forms.Form):
@@ -111,36 +113,27 @@ def get_available_executors(order,
     return available_executors
 
 
-def fetch_coordinates(apikey, address):
-    base_url = "https://geocode-maps.yandex.ru/1.x"
-    response = requests.get(base_url, params={
-        "geocode": address,
-        "apikey": apikey,
-        "format": "json",
-    })
-    response.raise_for_status()
-    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+def get_restaurants_with_distance(restaurants, order):
 
-    if not found_places:
-        return None
-
-    most_relevant = found_places[0]
-    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
-    return lon, lat
-
-
-def get_restaurants_with_distance(restaurants_with_coordinates,
-                                  order,
-                                  ya_geo_api_key=os.getenv('YANDEX_GEO_API_KEY')):
-
-    order_coordinates = fetch_coordinates(ya_geo_api_key, order.address)
+    order_coordinates, _ = Location.objects.get_or_create(address=order.address)
     available_restaurants = list()
-    for restaurant in get_available_executors(order, restaurants_with_coordinates):
-        if order_coordinates is None or restaurant.coordinates is None:
+    for restaurant in get_available_executors(order, restaurants):
+        restaurant_coordinates, _ = Location.objects.get_or_create(address=restaurant.address)
+
+        if order_coordinates.is_corrupted() or restaurant_coordinates.is_corrupted():
             distance = None
         else:
             distance = round(
-                calc_distance(order_coordinates, restaurant.coordinates).km,
+                calc_distance(
+                    (
+                        order_coordinates.longitude,
+                        order_coordinates.latitude
+                    ),
+                    (
+                        restaurant_coordinates.longitude,
+                        restaurant_coordinates.latitude
+                    )
+                ).km,
                 1
             )
         available_restaurants.append(
@@ -157,10 +150,6 @@ def view_orders(request):
 
     actual_orders = Order.objects.actual_orders()
     restaurants = Restaurant.objects.all().prefetch_related('menu_items__product')
-    ya_geo_api_key = os.getenv('YANDEX_GEO_API_KEY')
-
-    for restaurant in restaurants:
-        restaurant.coordinates = fetch_coordinates(ya_geo_api_key, restaurant.address)
 
     order_items = [
         {
