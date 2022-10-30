@@ -182,13 +182,12 @@ class Order(models.Model):
         choices=PAYMENT_METHODS,
         default='clarify'
     )
-    executor = models.CharField(
-        'Исполнитель',
-        max_length=50,
-        choices=set(
-            (restaurant.name, restaurant.name)
-            for restaurant in Restaurant.objects.all()
-        ),
+    executor = models.ForeignKey(
+        'Restaurant',
+        verbose_name='Исполнитель',
+        related_name='orders',
+        on_delete=models.PROTECT,
+        null=True,
         blank=True
     )
     objects = OrderQuerySet.as_manager()

@@ -164,7 +164,7 @@ def view_orders(request):
             'price': order.calc_price(),
             'comment': order.comment if order.comment else '',
             'available_restaurants': get_restaurants_with_distance(restaurants, order),
-            'executor': order.executor if order.executor else None,
+            'executor': order.executor.name if order.executor else None,
         }
         for order in actual_orders
     ]
