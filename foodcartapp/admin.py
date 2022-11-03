@@ -116,6 +116,7 @@ class ProductCategory(admin.ModelAdmin):
 
 class OrderedProductInline(admin.TabularInline):
     model = OrderedProduct
+    readonly_fields = ('price_at_the_order_moment', )
     extra = 0
 
 
@@ -128,7 +129,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at',
         'status',
     )
-    readonly_fields = ['created_at']
+    readonly_fields = ['created_at', ]
     inlines = (OrderedProductInline, )
     ordering = ('-status', 'created_at', )
 
@@ -154,3 +155,4 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderedProduct)
 class OrderedProductAdmin(admin.ModelAdmin):
     list_display = ('product', 'quantity')
+    readonly_fields = ('price_at_the_order_moment', )

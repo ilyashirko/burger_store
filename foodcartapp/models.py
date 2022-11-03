@@ -228,8 +228,7 @@ class OrderedProduct(models.Model):
         'Order',
         verbose_name='Заказ',
         related_name='ordered_product',
-        on_delete=models.PROTECT,
-        null=True
+        on_delete=models.PROTECT
     )
     product = models.ForeignKey(
         'Product',
@@ -246,9 +245,6 @@ class OrderedProduct(models.Model):
         max_digits=8,
         decimal_places=2,
         validators=[MinValueValidator(0)],
-        null=True,
-        blank=True,
-        help_text='Оставить пустым, заполняется автоматически'
     )
 
     def __str__(self):
