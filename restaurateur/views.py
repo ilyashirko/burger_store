@@ -144,7 +144,7 @@ def get_restaurants_with_distance(restaurants_with_locations, order):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
-    actual_orders = Order.objects.actual_orders()
+    actual_orders = Order.objects.actual_orders().with_products()
     restaurants = Restaurant.objects.prefetch_related('menu_items__product')
 
     for restaurant in restaurants:
