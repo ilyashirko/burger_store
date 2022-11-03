@@ -227,13 +227,13 @@ class OrderedProduct(models.Model):
     order = models.ForeignKey(
         'Order',
         verbose_name='Заказ',
-        related_name='ordered_product',
+        related_name='ordered_products',
         on_delete=models.PROTECT
     )
     product = models.ForeignKey(
         'Product',
         verbose_name='Товар',
-        related_name='ordered_product',
+        related_name='ordered_products',
         on_delete=models.PROTECT,
     )
     quantity = models.SmallIntegerField(

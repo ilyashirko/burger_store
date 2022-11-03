@@ -98,7 +98,7 @@ def get_available_executors(order,
                             current_restaurants=Restaurant.objects.all()):
     ordered_products = set(
         ordered_product.product
-        for ordered_product in order.ordered_product.all()
+        for ordered_product in order.ordered_products.all()
     )
     available_executors = list()
     for restaurant in current_restaurants:
