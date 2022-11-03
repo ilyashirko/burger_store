@@ -206,12 +206,6 @@ class Order(models.Model):
             ]
         )
 
-    def save(self, *args, **kwargs):
-        if self.executor and self.status == 'new':
-            self.status = 'in_process'
-        elif not self.executor and self.status != 'new':
-            self.status = 'new'
-        super().save(*args, **kwargs)
 
     class Meta:
         indexes = [

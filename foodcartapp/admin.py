@@ -133,6 +133,14 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = (OrderedProductInline, )
     ordering = ('-status', 'created_at', )
 
+    def save_model(self, request, obj, form, change):
+        if 'executor' in form.changed_data and form.data['executor']:
+            obj.status = 'in_process'
+        elif 'executor' in form.changed_data and not form.data['executor']:
+            obj.status = 'new'
+        super().save_model(request, obj, form, change)
+
+
     def save_formset(self, request, form, formset, change):
         added_products = formset.save(commit=False)
         deleted_products = formset.deleted_objects
@@ -143,7 +151,7 @@ class OrderAdmin(admin.ModelAdmin):
                 current_price = ordered_product.product.price
                 ordered_product.price_at_the_order_moment = current_price
             ordered_product.save()
-    
+
     def response_post_save_change(self, request, obj):
         response = super().response_post_save_change(request, obj)
         if "return" in request.GET:
