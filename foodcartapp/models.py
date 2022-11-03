@@ -239,7 +239,7 @@ class OrderedProduct(models.Model):
     )
     quantity = models.SmallIntegerField(
         'Количество',
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(1)],
     )
     price_at_the_order_moment = models.DecimalField(
         'Цена на время заказа',
