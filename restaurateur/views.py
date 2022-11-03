@@ -5,9 +5,10 @@ from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
-from foodcartapp.models import Order, Product, Restaurant
-from geo_management.models import Location
 from geopy.distance import distance as calc_distance
+
+from foodcartapp.models import Order, Product, Restaurant
+from geo_management.processing import get_or_create_location
 
 
 class Login(forms.Form):
@@ -111,18 +112,18 @@ def get_available_executors(order,
 
 
 def get_restaurants_with_distance(restaurants_with_locations, order):
-
-    order_coordinates, _ = Location.objects.get_or_create(address=order.address)
+    order_location = get_or_create_location(order.address)
+    print(f'{order.uuid}: {order_location}')
     available_restaurants = list()
     for restaurant in get_available_executors(order, restaurants_with_locations):
-        if order_coordinates.is_corrupted() or restaurant.location.is_corrupted():
+        if order_location.is_corrupted() or restaurant.location.is_corrupted():
             distance = None
         else:
             distance = round(
                 calc_distance(
                     (
-                        order_coordinates.longitude,
-                        order_coordinates.latitude
+                        order_location.longitude,
+                        order_location.latitude
                     ),
                     (
                         restaurant.location.longitude,
@@ -147,8 +148,7 @@ def view_orders(request):
     restaurants = Restaurant.objects.prefetch_related('menu_items__product')
 
     for restaurant in restaurants:
-        restaurant_location, _ = Location.objects.get_or_create(address=restaurant.address)
-        restaurant.location = restaurant_location
+        restaurant.location = get_or_create_location(restaurant.address)
 
     order_items = [
         {
@@ -165,7 +165,7 @@ def view_orders(request):
         }
         for order in actual_orders
     ]
- 
+
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
         'return_url': request.path

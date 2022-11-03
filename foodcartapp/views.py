@@ -8,6 +8,7 @@ from rest_framework.serializers import (CharField, IntegerField, ListField,
                                         Serializer)
 
 from .models import Order, OrderedProduct, Product
+from geo_management.processing import get_or_create_location
 
 
 @api_view(['GET'])
@@ -87,14 +88,18 @@ class OrderSerializer(Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        if not validated_data['products']:
+            raise ValueError
+
         order_object = Order.objects.create(
             firstname=validated_data['firstname'],
             lastname=validated_data['lastname'],
             phonenumber=validated_data['phonenumber'],
             address=validated_data['address']
         )
-        if not validated_data['products']:
-            raise ValueError
+
+        get_or_create_location(order_object.address)
+
         for product in validated_data['products']:
             product_object = Product.objects.get(id=product['product'])
             OrderedProduct.objects.get_or_create(

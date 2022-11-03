@@ -128,7 +128,7 @@ class RestaurantMenuItem(models.Model):
 class OrderQuerySet(models.QuerySet):
     def actual_orders(self):
         return self.exclude(status='complete') \
-            .prefetch_related('ordered_product__product') \
+            .prefetch_related('ordered_products__product') \
             .order_by('-status', 'created_at')
 
 
@@ -202,7 +202,7 @@ class Order(models.Model):
         return sum(
             [
                 product.product.price * product.quantity
-                for product in self.ordered_product.all()
+                for product in self.ordered_products.all()
             ]
         )
 
