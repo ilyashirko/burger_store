@@ -113,7 +113,6 @@ def get_available_executors(order,
 
 def get_restaurants_with_distance(restaurants_with_locations, order):
     order_location = get_or_create_location(order.address)
-    print(f'{order.uuid}: {order_location}')
     available_restaurants = list()
     for restaurant in get_available_executors(order, restaurants_with_locations):
         if order_location.is_corrupted() or restaurant.location.is_corrupted():
