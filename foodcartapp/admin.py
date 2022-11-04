@@ -152,8 +152,8 @@ class OrderAdmin(admin.ModelAdmin):
                 ordered_product.price_at_the_order_moment = current_price
             ordered_product.save()
 
-    def response_post_save_change(self, request, obj):
-        response = super().response_post_save_change(request, obj)
+    def response_change(self, request, obj):
+        response = super().response_change(request, obj)
         if "return" in request.GET:
             return redirect(request.GET['return'])
         else:
