@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -55,10 +56,10 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
+@transaction.atomic
 @api_view(['POST'])
 def register_order(request):
-    check = OrderSerializer(data=request.data)
-    check.is_valid(raise_exception=True)
-    check.save()
-    check.data['phonenumber'] = str(check.data['phonenumber'])
-    return Response(check.data)
+    order_serializer = OrderSerializer(data=request.data)
+    order_serializer.is_valid(raise_exception=True)
+    order_serializer.save()
+    return Response(order_serializer.data)
