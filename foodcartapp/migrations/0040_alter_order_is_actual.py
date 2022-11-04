@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('foodcartapp', '0039_add_test_data'),
+        ('foodcartapp', '0038_auto_20221014_1000'),
     ]
 
     operations = [
