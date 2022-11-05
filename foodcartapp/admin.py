@@ -8,6 +8,7 @@ from django.urls import reverse
 from .models import (Order, OrderedProduct, Product, ProductCategory,
                      Restaurant, RestaurantMenuItem)
 from restaurateur import views as restaurateur_views
+from geo_management.processing import get_or_create_location
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -30,6 +31,11 @@ class RestaurantAdmin(admin.ModelAdmin):
     inlines = [
         RestaurantMenuItemInline
     ]
+
+    def save_model(self, request, obj, form, change):
+        if 'address' in form.changed_data:
+            get_or_create_location(form.data['address'])
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Product)
@@ -134,6 +140,8 @@ class OrderAdmin(admin.ModelAdmin):
     ordering = ('-status', 'created_at', )
 
     def save_model(self, request, obj, form, change):
+        if 'address' in form.changed_data:
+            get_or_create_location(form.data['address'])
         if 'executor' in form.changed_data and form.data['executor']:
             obj.status = 'in_process'
         elif 'executor' in form.changed_data and not form.data['executor']:

@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MinLengthValidator
-import uuid
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -12,7 +11,6 @@ class Restaurant(models.Model):
     address = models.CharField(
         'адрес',
         max_length=100,
-        blank=True,
     )
     contact_phone = models.CharField(
         'контактный телефон',
@@ -149,15 +147,6 @@ class Order(models.Model):
         ('clarify', 'Уточнить у клиента')
     )
 
-    uuid = models.CharField(
-        "id",
-        unique=True,
-        default=uuid.uuid1,
-        max_length=36,
-        validators=[MinLengthValidator(36)],
-        primary_key=True,
-        editable=False
-    )
     firstname = models.CharField('Имя заказчика', max_length=100)
     lastname = models.CharField('Фамилия заказчика', max_length=100)
     phonenumber = PhoneNumberField('Телефон заказчика')
@@ -196,7 +185,7 @@ class Order(models.Model):
 
     def __str__(self):
         return (
-            f'[{self.uuid}] - {self.phonenumber} '
+            f'[{self.id}] - {self.phonenumber} '
             f'({self.firstname} {self.lastname})'
         )
 

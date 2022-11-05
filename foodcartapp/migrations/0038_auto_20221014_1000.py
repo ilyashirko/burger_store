@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Order',
             fields=[
-                ('uuid', models.CharField(default=uuid.uuid1, editable=False, max_length=36, primary_key=True, serialize=False, unique=True, validators=[django.core.validators.MinLengthValidator(36)], verbose_name='id')),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('first_name', models.CharField(max_length=100, verbose_name='Имя заказчика')),
                 ('last_name', models.CharField(max_length=100, verbose_name='Фамилия заказчика')),
                 ('phonenumber', phonenumber_field.modelfields.PhoneNumberField(max_length=128, region=None, verbose_name='Телефон заказчика')),

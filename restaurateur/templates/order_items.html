@@ -27,7 +27,7 @@
 
     {% for item in order_items %}
       <tr>
-        <td>{{item.uuid}}</td>
+        <td>{{item.id}}</td>
         <td>{{item.status}}</td>
         <td>{{item.payment_method}}</td>
         <td>{{item.price}}</td>
@@ -53,7 +53,7 @@
             </ul>
           </td>
         {% endif %}
-        <td><a href="{% url 'admin:foodcartapp_order_change' 	object_id=item.uuid %}?return={{ return_url }}">Редактировать</a></td>
+        <td><a href="{% url 'admin:foodcartapp_order_change' 	object_id=item.id %}?return={{ return_url }}">Редактировать</a></td>
       </tr>
     {% endfor %}
    </table>

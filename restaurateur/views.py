@@ -151,7 +151,7 @@ def view_orders(request):
 
     order_items = [
         {
-            'uuid': order.uuid,
+            'id': order.id,
             'status': order.get_status_display(),
             'payment_method': order.get_payment_method_display(),
             'client': f'{order.firstname} {order.lastname}',
