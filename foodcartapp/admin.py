@@ -1,14 +1,12 @@
 from django.contrib import admin
-from django.http import HttpResponseRedirect
-from django.shortcuts import reverse, redirect
+from django.shortcuts import redirect, reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
-from django.urls import reverse
+
+from geo_management.processing import get_or_create_location
 
 from .models import (Order, OrderedProduct, Product, ProductCategory,
                      Restaurant, RestaurantMenuItem)
-from restaurateur import views as restaurateur_views
-from geo_management.processing import get_or_create_location
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -147,7 +145,6 @@ class OrderAdmin(admin.ModelAdmin):
         elif 'executor' in form.changed_data and not form.data['executor']:
             obj.status = 'new'
         super().save_model(request, obj, form, change)
-
 
     def save_formset(self, request, form, formset, change):
         added_products = formset.save(commit=False)
