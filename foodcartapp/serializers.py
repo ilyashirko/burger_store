@@ -47,5 +47,5 @@ class OrderSerializer(ModelSerializer):
                 quantity=product['quantity'],
                 price_at_the_order_moment=product_object.price
             )
-        self.uuid = order_object.uuid
+        self.id = order_object.id
         return order_object
