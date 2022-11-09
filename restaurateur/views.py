@@ -2,12 +2,14 @@ from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
+from django.db.models import OuterRef, Subquery
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from geopy.distance import distance as calc_distance
 
 from foodcartapp.models import Order, Product, Restaurant
+from geo_management.models import Location
 from geo_management.processing import get_or_create_location
 
 
@@ -112,21 +114,20 @@ def get_available_executors(order,
 
 
 def get_restaurants_with_distance(restaurants_with_locations, order):
-    order_location = get_or_create_location(order.address)
     available_restaurants = list()
     for restaurant in get_available_executors(order, restaurants_with_locations):
-        if order_location.is_corrupted() or restaurant.location.is_corrupted():
+        if order.longitude is None or restaurant.longitude is None:
             distance = None
         else:
             distance = round(
                 calc_distance(
                     (
-                        order_location.longitude,
-                        order_location.latitude
+                        order.longitude,
+                        order.latitude
                     ),
                     (
-                        restaurant.location.longitude,
-                        restaurant.location.latitude
+                        restaurant.longitude,
+                        restaurant.latitude
                     )
                 ).km,
                 1
@@ -143,11 +144,20 @@ def get_restaurants_with_distance(restaurants_with_locations, order):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
-    actual_orders = Order.objects.actual_orders().with_products()
-    restaurants = Restaurant.objects.prefetch_related('menu_items__product')
+    locations = Location.objects.filter(address=OuterRef('address'))
 
-    for restaurant in restaurants:
-        restaurant.location = get_or_create_location(restaurant.address)
+    actual_orders = Order.objects.actual_orders().with_products().with_total() \
+        .prefetch_related('executor').annotate(
+            longitude=Subquery(locations.values('longitude')),
+            latitude=Subquery(locations.values('latitude'))
+        )
+
+
+    restaurants = Restaurant.objects.prefetch_related('menu_items__product') \
+        .annotate(
+            longitude=Subquery(locations.values('longitude')),
+            latitude=Subquery(locations.values('latitude'))
+        )
 
     order_items = [
         {
@@ -157,7 +167,7 @@ def view_orders(request):
             'client': f'{order.firstname} {order.lastname}',
             'phonenumber': str(order.phonenumber),
             'address': order.address,
-            'price': order.calc_price(),
+            'price': order.total,
             'comment': order.comment if order.comment else '',
             'available_restaurants': get_restaurants_with_distance(restaurants, order),
             'executor': order.executor.name if order.executor else None,
