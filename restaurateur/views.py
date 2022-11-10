@@ -10,7 +10,6 @@ from geopy.distance import distance as calc_distance
 
 from foodcartapp.models import Order, Product, Restaurant
 from geo_management.models import Location
-from geo_management.processing import get_or_create_location
 
 
 class Login(forms.Form):
@@ -84,10 +83,14 @@ def view_products(request):
             (product, ordered_availability)
         )
 
-    return render(request, template_name="products_list.html", context={
-        'products_with_restaurant_availability': products_with_restaurant_availability,
-        'restaurants': restaurants,
-    })
+    return render(
+        request,
+        template_name="products_list.html",
+        context={
+            'products_with_restaurant_availability': products_with_restaurant_availability,
+            'restaurants': restaurants,
+        }
+    )
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
@@ -104,6 +107,7 @@ def get_available_executors(order,
         for ordered_product in order.ordered_products.all()
     )
     available_executors = list()
+
     for restaurant in current_restaurants:
         restaurant_products = set(
             item.product for item in restaurant.menu_items.all()
@@ -143,7 +147,6 @@ def get_restaurants_with_distance(restaurants_with_locations, order):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-
     locations = Location.objects.filter(address=OuterRef('address'))
 
     actual_orders = Order.objects.actual_orders().with_products().with_total() \
@@ -151,14 +154,11 @@ def view_orders(request):
             longitude=Subquery(locations.values('longitude')),
             latitude=Subquery(locations.values('latitude'))
         )
-
-
     restaurants = Restaurant.objects.prefetch_related('menu_items__product') \
         .annotate(
             longitude=Subquery(locations.values('longitude')),
             latitude=Subquery(locations.values('latitude'))
         )
-
     order_items = [
         {
             'id': order.id,

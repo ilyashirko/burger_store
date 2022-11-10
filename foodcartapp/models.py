@@ -135,8 +135,8 @@ class OrderQuerySet(models.QuerySet):
     def with_total(self):
         return self.annotate(
             total=Sum(
-                F('ordered_products__price_at_the_order_moment') * \
-                    F('ordered_products__quantity')
+                F('ordered_products__price_at_the_order_moment') *
+                F('ordered_products__quantity')
                 )
             )
 
@@ -175,7 +175,12 @@ class Order(models.Model):
         null=True,
     )
     comment = models.TextField('Комментарий', blank=True)
-    status = models.CharField('Статус заказа', max_length=50, choices=STATUSES, default='new')
+    status = models.CharField(
+        'Статус заказа',
+        max_length=50,
+        choices=STATUSES,
+        default='new'
+    )
     payment_method = models.CharField(
         'Способ оплаты',
         max_length=50,
@@ -197,7 +202,6 @@ class Order(models.Model):
             f'[{self.id}] - {self.phonenumber} '
             f'({self.firstname} {self.lastname})'
         )
-
 
     class Meta:
         indexes = [
