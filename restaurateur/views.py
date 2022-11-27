@@ -179,3 +179,10 @@ def view_orders(request):
         'order_items': order_items,
         'return_url': request.path
     })
+
+from django.http import HttpResponse
+
+def raise_error(request):
+    a = None
+    a.hello() # Creating an error with an invalid line of code
+    return HttpResponse("Hello, world. You're at the pollapp index.")
