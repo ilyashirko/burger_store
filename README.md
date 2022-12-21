@@ -165,3 +165,4 @@ chmod ugo+x deploy
 
 - Второй и третий урок [учебного курса Django](https://dvmn.org/modules/django/)
 
+На время ревью сайт располагается по адресу https://ilyashirko-dev.site
