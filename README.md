@@ -149,6 +149,14 @@ Parcel будет следить за файлами в каталоге `bundle
 - `YANDEX_GEO_API_KEY` — Для корректного отображения расстояния от ресторанов до адресов клиентов необходимо подключить специальный [сервис Yandex](https://developer.tech.yandex.ru/services/). После регистрации сервиса вы получите API KEY.
 - `ROLLBAR_ACCESS_TOKEN` — [Account access token](https://rollbar.com/settings)
 - `POSTGRE_URL` - URL для входа инициализации PostgreSQL базы. [Создать и настроить БД](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04), [URL Schema](https://github.com/jazzband/dj-database-url)
+
+## Быстрый деплой
+В корневой папке проекта есть bash-скрипт `deploy` который сделает все необходимое для быстрого деплоя.  
+Присвойте ему рут права:
+```sh
+chmod ugo+x deploy
+```
+и далее для быстрого редеплоя просто введите `./deploy` из корневой директории
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
