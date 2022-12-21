@@ -34,3 +34,13 @@ echo "[INFO]: burger_store_gunicorn.service restarted"
 echo "[INFO]: reloading NGINX"
 systemctl reload nginx.service
 echo "[INFO]: nginx reloaded"
+
+export $(egrep -v '^#' .env | xargs)
+curl --request POST \
+     --url https://api.rollbar.com/api/1/deploy \
+     --header "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
+     --header 'accept: application/json' \
+     --header 'content-type: application/json' \
+     --data '{"environment": "production", "revision": "'"$(git rev-parse HEAD)"'"}'
+
+echo "[INFO]: ROLLBAR report sent"
