@@ -14,7 +14,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 YA_GEO_API_KEY = env.str('YANDEX_GEO_API_KEY')
 
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', True)
+DEBUG = env.bool('DEBUG', False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
@@ -132,7 +132,7 @@ STATICFILES_DIRS = [
 
 ROLLBAR = {
     'access_token': env.str('ROLLBAR_ACCESS_TOKEN'),
-    'environment': 'development' if DEBUG else 'production',
+    'environment': env.str('ROLLBAR_ENVIRONMENT', 'production'),
     'code_version': '1.0',
     'root': BASE_DIR,
 }
