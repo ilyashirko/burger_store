@@ -10,6 +10,7 @@ venv
 media
 *.sqlite3
 .json
+staticfiles
 
 # IDE
 **/__pycache__
