@@ -21,8 +21,8 @@ echo "[INFO]: recollecting static"
 env/bin/python3 manage.py collectstatic --noinput
 echo "[INFO]: static collected"
 
-echo "[INFO]: making migrations"
-env/bin/python3 manage.py makemigrations
+echo "[INFO]: check migrations"
+env/bin/python3 manage.py makemigrations --dry-run --check
 
 echo "[INFO]: applying migrations"
 env/bin/python3 manage.py migrate
