@@ -2,11 +2,11 @@
 
 set -e
 echo "[INFO]: try to git pull"
-git pull
+git pull -q --rebase --no-edit
 echo "[INFO]: git pulled"
 
 echo "[INFO]: updating Python dependencies"
-env/bin/pip3 install -r requirements.txt
+yes | env/bin/pip3 install -r requirements.txt
 echo "[INFO]: Python dependencies updated"
 
 echo "[INFO]: updating JS dependencies"
@@ -25,7 +25,7 @@ echo "[INFO]: check migrations"
 env/bin/python3 manage.py makemigrations --dry-run --check
 
 echo "[INFO]: applying migrations"
-env/bin/python3 manage.py migrate
+env/bin/python3 manage.py migrate --noinput
 
 echo "[INFO]: restarting burger_store_gunicorn.service"
 systemctl restart burger_store_gunicorn.service
